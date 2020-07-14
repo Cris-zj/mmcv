@@ -28,7 +28,7 @@ class LrUpdaterHook(Hook):
                  warmup_by_epoch=False):
         # validate the "warmup" argument
         if warmup is not None:
-            if warmup not in ['constant', 'linear', 'exp']:
+            if warmup not in ['constant', 'linear', 'exp', 'pow']:
                 raise ValueError(
                     f'"{warmup}" is not a supported type for warming up, valid'
                     ' types are "constant" and "linear"')
@@ -88,6 +88,9 @@ class LrUpdaterHook(Hook):
             warmup_lr = [_lr * (1 - k) for _lr in self.regular_lr]
         elif self.warmup == 'exp':
             k = self.warmup_ratio**(1 - cur_iters / self.warmup_iters)
+            warmup_lr = [_lr * k for _lr in self.regular_lr]
+        elif self.warmup == 'pow':
+            k = pow(cur_iters / self.warmup_iters, 1 / self.warmup_ratio)
             warmup_lr = [_lr * k for _lr in self.regular_lr]
         return warmup_lr
 
